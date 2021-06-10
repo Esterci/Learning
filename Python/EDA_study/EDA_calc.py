@@ -149,8 +149,7 @@ def main(n_i,total, background_percent, test_size, dat_set_percent):
 
     # Concatenating Signal and the Background sub-sets
     
-    training_data = np.vstack((background_seed,training_signal))    
-
+    training_data = np.vstack((background_seed,training_signal))
 
     print("=> Iteration Number {}:             .Training shape 2: {}".format((n_i+1),training_data.shape))
     print("=> Iteration Number {}:             .Training Background shape 2: {}".format((n_i+1),background_seed.shape))
@@ -193,6 +192,7 @@ def main(n_i,total, background_percent, test_size, dat_set_percent):
 # --------------------- INITIATION --------------------- #
 # ------------------------------------------------------ #
 ##########################################################
+
 ### Define User Variables ###
 
 PROCESSES = 4
