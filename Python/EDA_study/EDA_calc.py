@@ -8,18 +8,11 @@ from sklearn.decomposition import PCA
 import math as m
 from sklearn.naive_bayes import GaussianNB
 from numba import njit
-from datetime import datetime
-import multiprocessing
 
-def calculate(func, args):
-    result = func(*args)
-    return result
-
-def calculatestar(args):
-    return calculate(*args)
 
 def hand_norm(A):
     return m.sqrt(np.sum(A ** 2))
+
 
 def hand_scalar_prod(A,B):
     prod = np.zeros((len(A)))
@@ -29,6 +22,7 @@ def hand_scalar_prod(A,B):
         k +=1
         
     return np.sum(prod)
+
 
 def hand_dist(A,B, metric = 'euclidean'):
     dist = np.zeros((len(A),(len(A))))
@@ -53,6 +47,7 @@ def hand_dist(A,B, metric = 'euclidean'):
             
     return dist
 
+
 def EDA_calc (data, metric='euclidean'):            
     dist = hand_dist(data, data, metric=metric)
     
@@ -61,153 +56,6 @@ def EDA_calc (data, metric='euclidean'):
     GD = np.sum(CP)/(2*CP)
 
     return GD
-
-def main(n_i,total, background_percent, test_size, dat_set_percent):
-    
-    current_time = datetime.now().strftime("%H:%M:%S")
-    
-    print('=> Iteration Number {}:         .Initiation time:'.format(n_i+1),current_time)
-
-    # Divide data-set into training and testing sub-sets
-    print('=> Iteration Number {}:         .Dividing training and testing sub-sets'.format(n_i+1))
-    
-    # Reducing background samples
-    _,reduced_background = train_test_split(background, test_size=dat_set_percent)
-    
-    # Dividing training and test sub-sets
-    background_seed, streaming_background = train_test_split(reduced_background, test_size=test_size)
-    
-    # Iserting the correct number of signal in training
-    _,background_seed = train_test_split(background_seed, test_size=background_percent)    
-    
-    n_signal_samples = len(background_seed)*(1-background_percent)
-    
-    _,training_signal = train_test_split(signal, test_size=n_signal_samples/len(signal))
-    
-    # Iserting the correct number of signal in streaming
-    
-    _,streaming_background = train_test_split(streaming_background, test_size=background_percent)
-    
-    n_signal_samples = len(streaming_background)*(1-background_percent)
-    
-    _,streaming_signal = train_test_split(signal, test_size=n_signal_samples/len(signal))
-
-    # Concatenating Signal and the Background sub-sets
-    
-    streaming_data = np.vstack((streaming_background,streaming_signal))
-    training_data = np.vstack((background_seed,training_signal))    
-
-
-    print("=> Iteration Number {}:             .Training shape: {}".format((n_i+1),training_data.shape))
-    print("=> Iteration Number {}:             .Training Background shape: {}".format((n_i+1),background_seed.shape))
-    print("=> Iteration Number {}:             .Training Signal shape: {}".format((n_i+1),training_signal.shape))
-    print("=> Iteration Number {}:             .Streaming shape: {}".format((n_i+1),streaming_data.shape))
-    print("=> Iteration Number {}:             .Streaming Background shape: {}".format((n_i+1),streaming_background.shape))
-    print("=> Iteration Number {}:             .Streaming Signal shape: {}".format((n_i+1),streaming_signal.shape))
-
-    # Normalize Data
-    print('=> Iteration Number {}:         .Normalizing Data'.format(n_i+1))
-    streaming_data = normalize(streaming_data,norm='max',axis=0)
-    training_data = normalize(training_data,norm='max',axis=0)
-
-    # Creating Labels
-    print('=> Iteration Number {}:         .Creating Labels'.format(n_i+1))
-    y_training =np.ones((len(training_data)))
-    y_training[:len(background_seed)] = 0
-    
-    y_streaming =np.ones((len(streaming_data)))
-    y_streaming[:len(streaming_background)] = 0
-
-    # Training Naive Bayes
-    print('=> Iteration Number {}:         .Training Naive Bayes'.format(n_i+1))
-    clf = GaussianNB(priors=[0.99,0.01])
-    clf.fit(training_data, y_training)
-
-    prob = clf.predict_proba(streaming_data)[:,0]
-    
-    np.savetxt('bayes_prob_99_' + str(n_i) +'.csv', prob, delimiter=',')
-
-    # Calculating EDA
-    print('=> Iteration Number {}:         .Calculating EDA'.format(n_i+1))
-    streaming_eda_bayes = prob * EDA_calc(streaming_data,metric ='euclidean')
-
-    np.savetxt('streaming_eda_bayes_99_' + str(n_i) +'_euclidean.csv',streaming_eda_bayes,delimiter=',')
-
-    streaming_eda_bayes = prob * EDA_calc(streaming_data,metric ='cosine')
-
-    np.savetxt('streaming_eda_bayes_99_' + str(n_i) +'_cosine.csv',streaming_eda_bayes,delimiter=',')
-
-    streaming_eda_bayes = prob * EDA_calc(streaming_data,metric ='mahalanobis')
-
-    np.savetxt('streaming_eda_bayes_99_' + str(n_i) +'_mahalanobis.csv',streaming_eda_bayes,delimiter=',')
-
-    ####################### Redivising Signal ##############################
-
-    print('=> Iteration Number {}:         .Dividing training and testing sub-sets with 50%/50%')
-
-    _,training_signal = train_test_split(signal, test_size=len(background_seed)/len(signal))
-
-    # Concatenating Signal and the Background sub-sets
-    
-    training_data = np.vstack((background_seed,training_signal))
-
-    print("=> Iteration Number {}:             .Training shape 2: {}".format((n_i+1),training_data.shape))
-    print("=> Iteration Number {}:             .Training Background shape 2: {}".format((n_i+1),background_seed.shape))
-    print("=> Iteration Number {}:             .Training Signal shape 2: {}".format((n_i+1),training_signal.shape))
-
-    # Normalize Data
-    print('=> Iteration Number {}:         .Normalizing Data 2'.format(n_i+1))
-    training_data = normalize(training_data,norm='max',axis=0)
-
-    # Creating Labels
-    print('=> Iteration Number {}:         .Creating Labels 2'.format(n_i+1))
-    y_training =np.ones((len(training_data)))
-    y_training[:len(background_seed)] = 0
-
-    # Training Naive Bayes
-    print('=> Iteration Number {}:         .Training Naive Bayes 2'.format(n_i+1))
-    clf = GaussianNB(priors=[0.5,0.5])
-    clf.fit(training_data, y_training)
-
-    prob = clf.predict_proba(streaming_data)[:,0]
-    
-    np.savetxt('bayes_prob_50_' + str(n_i) +'.csv', prob, delimiter=',')
-
-    # Calculating EDA
-    print('=> Iteration Number {}:         .Calculating EDA 2'.format(n_i+1))
-    streaming_eda_bayes = prob * EDA_calc(streaming_data,metric ='euclidean')
-
-    np.savetxt('streaming_eda_bayes_50_' + str(n_i) +'_euclidean.csv',streaming_eda_bayes,delimiter=',')
-
-    streaming_eda_bayes = prob * EDA_calc(streaming_data,metric ='cosine')
-
-    np.savetxt('streaming_eda_bayes_50_' + str(n_i) +'_cosine.csv',streaming_eda_bayes,delimiter=',')
-
-    streaming_eda_bayes = prob * EDA_calc(streaming_data,metric ='mahalanobis')
-
-    np.savetxt('streaming_eda_bayes_50_' + str(n_i) +'_mahalanobis.csv',streaming_eda_bayes,delimiter=',')
-
-##########################################################
-# ------------------------------------------------------ #
-# --------------------- INITIATION --------------------- #
-# ------------------------------------------------------ #
-##########################################################
-
-### Define User Variables ###
-
-PROCESSES = 4
-
-# Number of Iterations
-iterations = 33
-
-# Number of events
-total = 20000
-
-# Percentage of background samples on the testing phase
-background_percent = 0.99
-
-# Percentage of samples on the training phase
-test_size = 0.3
 
 ##########################################################
 # ------------------------------------------------------ #
@@ -237,15 +85,114 @@ Ls, _ = signal.shape
 print("     .Signal Loaded...")
 print("     .Signal shape: {}\n".format(signal.shape))
 
-# Percentage of background samples to divide the data-set
-dat_set_percent = total/len(background)
-
 print('\n          ==== Initiation Complete ====\n')
 print('=*='*17 )
 print('      ==== Commencing Data Processing ====')
 
-with multiprocessing.Pool(PROCESSES) as pool:
+##########################################################
+# ------------------------------------------------------ #
+# --------------------- INITIATION --------------------- #
+# ------------------------------------------------------ #
+##########################################################
+### Define User Variables ###
 
-        TASKS = [(main, (n_i,total, background_percent, test_size, dat_set_percent)) for n_i in range(iterations)]
+# Number of Iterations
+iterations = 33
 
-        pool.map(calculatestar, TASKS)
+# Number of events
+total = 10000
+
+# Percentage of background samples on the testing phase
+background_percent = 0.99
+
+# Percentage of samples on the training phase
+test_size = 0.3
+
+# Percentage of background samples to divide the data-set
+dat_set_percent = total/len(background)
+
+
+for n_i in range(iterations):
+    print('\n     => Iteration Number', (n_i+1) )
+
+    # Divide data-set into training and testing sub-sets
+    print('         .Dividing training and testing sub-sets')
+    
+    # Reducing background samples
+    _,reduced_background = train_test_split(background, test_size=dat_set_percent)
+    
+    # Dividing training and test sub-sets
+    background_seed, streaming_background = train_test_split(reduced_background, test_size=test_size)
+    
+    n_signal_samples = len(background_seed)*(1-background_percent)
+
+    # Iserting the correct number of signal in training
+    _,background_seed = train_test_split(background_seed, test_size=background_percent)    
+    
+    _,training_signal = train_test_split(signal, test_size=n_signal_samples/len(signal))
+    
+    n_signal_samples = len(streaming_background)*(1-background_percent)
+
+    # Iserting the correct number of signal in streaming
+    _,streaming_background = train_test_split(streaming_background, test_size=background_percent)
+    
+    _,streaming_signal = train_test_split(signal, test_size=n_signal_samples/len(signal))
+
+    # Concatenating Signal and the Background sub-sets
+    
+    streaming_data = np.vstack((streaming_background,streaming_signal))
+    training_data = np.vstack((background_seed,training_signal))    
+
+
+    print("             .Training shape: {}\n".format(training_data.shape))
+    print("             .Training Background shape: {}\n".format(background_seed.shape))
+    print("             .Training Signal shape: {}\n".format(training_signal.shape))
+    print("             .Streaming shape: {}\n".format(streaming_data.shape))
+    print("             .Streaming Background shape: {}\n".format(streaming_background.shape))
+    print("             .Streaming Signal shape: {}\n".format(streaming_signal.shape))
+
+    # Normalize Data
+    print('         .Normalizing Data')
+    streaming_data = normalize(streaming_data,norm='max',axis=0)
+    training_data = normalize(training_data,norm='max',axis=0)
+
+    # Creating Labels
+    print('         .Creating Labels')
+    y_training =np.ones((len(training_data)))
+    y_training[:len(background_seed)] = 0
+    
+    y_streaming =np.ones((len(streaming_data)))
+    y_streaming[:len(streaming_background)] = 0
+
+    # Training Naive Bayes
+    print('         .Training Naive Bayes')
+
+
+    # Calculating EDA
+    print('         .Calculating EDA\n')
+    streaming_eda_bayes = EDA_calc(np.vstack((training_data,streaming_data)),metric ='euclidean')
+
+    clf = GaussianNB(priors=[0.99,0.01])
+    clf.fit(streaming_eda_bayes[:len(training_data)].reshape((-1,1)), y_training)
+
+    prob = clf.predict_proba(streaming_eda_bayes[len(training_data):].reshape((-1,1)))[:,0]
+
+    np.savetxt('results_99/streaming_eda_bayes_99_' + str(n_i) +'_euclidean.csv',prob,delimiter=',')
+
+    streaming_eda_bayes = EDA_calc(np.vstack((training_data,streaming_data)),metric ='cosine')
+
+    clf = GaussianNB(priors=[0.99,0.01])
+    clf.fit(streaming_eda_bayes[:len(training_data)].reshape((-1,1)), y_training)
+
+    prob = clf.predict_proba(streaming_eda_bayes[len(training_data):].reshape((-1,1)))[:,0]
+
+    np.savetxt('results_99/streaming_eda_bayes_99_' + str(n_i) +'_cosine.csv',prob,delimiter=',')
+
+    streaming_eda_bayes = EDA_calc(np.vstack((training_data,streaming_data)),metric ='mahalanobis')
+
+    clf = GaussianNB(priors=[0.99,0.01])
+    clf.fit(streaming_eda_bayes[:len(training_data)].reshape((-1,1)), y_training)
+
+    prob = clf.predict_proba(streaming_eda_bayes[len(training_data):].reshape((-1,1)))[:,0]
+
+    np.savetxt('results_99/streaming_eda_bayes_99_' + str(n_i) +'_mahalanobis.csv',prob,delimiter=',')
