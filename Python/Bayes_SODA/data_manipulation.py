@@ -429,5 +429,7 @@ def SODA_Granularity_Iteration(offline_data,streaming_data,gra,prob,Iteration):
     performance_info.loc[0,'Mean RAM_Usage_GB'] = performance_out['mean_ram_u']
     performance_info.loc[0,'Max RAM_Usage_GB'] = performance_out['max_ram_u']
 
-    np.savetxt('results/SODA_labels__'+ str(gra) + '__' + str(Iteration) +'.csv', out['IDX'],delimiter=',')
-    performance_info.to_csv('results/performance_info__' + str(gra) + '__' + str(Iteration) + '.csv', index=False)
+    np.savetxt('results/SODA_labels__'+ str(gra) + '__' + str(Iteration) +'__.csv', out['IDX'],delimiter=',')
+    np.savetxt('results/Density_1__'+ str(gra) + '__' + str(Iteration) +'__.csv', out['Density1'],delimiter=',')
+    np.savetxt('results/Density_2__'+ str(gra) + '__' + str(Iteration) +'__.csv', out['Density2'],delimiter=',')
+    performance_info.to_csv('results/performance_info__' + str(gra) + '__' + str(Iteration) + '__.csv', index=False)

@@ -65,16 +65,16 @@ def main():
     ##########################################################
     
     ### Define Granularities to run
-    granularity = [1,2,3,4]
+    granularity = [1,2,3,4,5,6,7,8]
     
     ### Define User Variables ###
     PROCESSES = 4
 
     # Number of Iterations
-    iterations = 1
+    iterations = 33
 
     # Number of events
-    total = 100000
+    total = 1000
 
     # Percentage of background samples on the testing phase
     background_percent = 0.99
@@ -170,7 +170,7 @@ def main():
 
         prob = kde_naive_bayes(np.vstack((training_data,streaming_data)),seed_kde_dict,0.99)
         
-        np.savetxt('results/posterior_probability__' + str(n_i) +'.csv', prob, delimiter=',')
+        np.savetxt('results/posterior_probability__' + str(n_i) +'__.csv', prob, delimiter=',')
 
         print('Creating pool with %d processes\n' % PROCESSES)
 

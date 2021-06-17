@@ -83,7 +83,7 @@ def Globaldensity_Calculator(data, distancetype, prob):
     GD = GD[index]
     Uniquesample = Uniquesample[index]
 
-    return GD, Uniquesample
+    return GD,Density_1 * prob, Density_2 * prob, Uniquesample
 
 @njit(fastmath = True)
 def chessboard_division_njit(Uniquesample, MMtypicality, interval1, interval2, distancetype):
@@ -466,7 +466,7 @@ def SelfOrganisedDirectionAwareDataPartitioning(Input, Mode):
 
         X1, AvD1, AvD2, grid_trad, grid_angl = grid_set(data,N)
         
-        GD, Uniquesample = Globaldensity_Calculator(data, distancetype, prob)
+        GD, D1, D2, Uniquesample = Globaldensity_Calculator(data, distancetype, prob)
         
         var = {'a': Uniquesample, 'b': GD, 'c':grid_trad, 'd':grid_angl, 'e':distancetype}
         BOX,BOX_miu,BOX_X,BOX_S,BOXMT,NB = chessboard_division_njit(Uniquesample,GD,grid_trad,grid_angl, distancetype)
@@ -541,7 +541,10 @@ def SelfOrganisedDirectionAwareDataPartitioning(Input, Mode):
     Output = {'C': Center,
               'IDX': IDX,
               'SystemParams': Boxparameter,
-              'DistanceType': distancetype}
+              'DistanceType': distancetype,
+              'Density1': D1,
+              'Density2': D2 
+              }
     return Output
 
 def SODA_plot(background,signal):
