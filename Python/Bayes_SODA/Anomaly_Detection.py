@@ -74,7 +74,7 @@ def main():
     iterations = 33
 
     # Number of events
-    total = 1000
+    total = 10000
 
     # Percentage of background samples on the testing phase
     background_percent = 0.99
@@ -161,16 +161,7 @@ def main():
         y =np.ones((len(streaming_data)+len(training_data)))
         y[:len(training_data) + len(streaming_background)] = 0
         y[:len(training_data)] = -1
-        np.savetxt('results/y_streaming.csv',y,delimiter=',')
-
-        # Training Naive Bayes
-        print('=> Iteration Number {}:         .Calculating Naive Bayes'.format(n_i+1))
-        
-        seed_kde_dict = kde_dictionary(training_data)
-
-        prob = kde_naive_bayes(np.vstack((training_data,streaming_data)),seed_kde_dict,0.99)
-        
-        np.savetxt('results/posterior_probability__' + str(n_i) +'__.csv', prob, delimiter=',')
+        np.savetxt('results/target__.csv',y,delimiter=',')
 
         print('Creating pool with %d processes\n' % PROCESSES)
 
@@ -179,7 +170,7 @@ def main():
             #
             # Tests
 
-            TASKS = [(dm.SODA_Granularity_Iteration, (training_data,streaming_data, gra,prob,n_i)) for gra in granularity]
+            TASKS = [(dm.SODA_Granularity_Iteration, (training_data,streaming_data, gra,y,n_i)) for gra in granularity]
 
             pool.map(calculatestar, TASKS)
 

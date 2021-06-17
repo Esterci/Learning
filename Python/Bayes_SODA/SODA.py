@@ -9,6 +9,18 @@ import numba as nb
 import multiprocessing as mp
 import pickle
 import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
+
+def one_class_naive_bayes (X, kde):
+    
+    # calculate the independent conditional probability
+    L = len(X)
+    prob = np.ones((L))
+        
+    for i in range(L):
+        for kde in kde_dict:
+            prob[i] *= kde_dict[kde](X[i])
+    return prob
 
 def grid_set(data, N):
     _ , W = data.shape
@@ -65,7 +77,7 @@ def pi_calculator(Uniquesample, mode):
         
     return uspi
 
-def Globaldensity_Calculator(data, distancetype, prob):
+def Globaldensity_Calculator(data, distancetype, target):
     Uniquesample = np.array(data)
     
     uspi1 = pi_calculator(Uniquesample, distancetype)
@@ -73,17 +85,29 @@ def Globaldensity_Calculator(data, distancetype, prob):
     sum_uspi1 = sum(uspi1)
     Density_1 = uspi1 / sum_uspi1
 
+    kde_Density_1 = gaussian_kde(Density_1[target==-1])
+
+    prob_1 = kde_Density_1(Density_1)
+
+    Density_1 *= prob_1
+
     uspi2 = pi_calculator(Uniquesample, 'cosine')
 
     sum_uspi2 = sum(uspi2)
     Density_2 = uspi2 / sum_uspi2
 
-    GD = (Density_2+Density_1) * prob
+    kde_Density_2 = gaussian_kde(Density_2[target==-1])
+
+    prob_2 = kde_Density_2(Density_2)
+
+    Density_2 *= prob_2
+
+    GD = (Density_2+Density_1)
     index = GD.argsort()[::-1]
     GD = GD[index]
     Uniquesample = Uniquesample[index]
 
-    return GD,Density_1 * prob, Density_2 * prob, Uniquesample
+    return GD,Density_1, Density_2, Uniquesample
 
 @njit(fastmath = True)
 def chessboard_division_njit(Uniquesample, MMtypicality, interval1, interval2, distancetype):
@@ -462,12 +486,12 @@ def SelfOrganisedDirectionAwareDataPartitioning(Input, Mode):
         L, W = data.shape
         N = Input['GridSize']
         distancetype = Input['DistanceType']
-        prob = Input['PosteriorProbability']
+        target = Input['Target']
 
         X1, AvD1, AvD2, grid_trad, grid_angl = grid_set(data,N)
         
-        GD, D1, D2, Uniquesample = Globaldensity_Calculator(data, distancetype, prob)
-        
+        GD, D1, D2, Uniquesample = Globaldensity_Calculator(data, distancetype, target)
+
         var = {'a': Uniquesample, 'b': GD, 'c':grid_trad, 'd':grid_angl, 'e':distancetype}
         BOX,BOX_miu,BOX_X,BOX_S,BOXMT,NB = chessboard_division_njit(Uniquesample,GD,grid_trad,grid_angl, distancetype)
 

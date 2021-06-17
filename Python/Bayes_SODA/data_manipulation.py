@@ -391,7 +391,7 @@ def statistics_attributes(data):
                                         #bayes_min, bayes_max
     return output_data
 
-def SODA_Granularity_Iteration(offline_data,streaming_data,gra,prob,Iteration):
+def SODA_Granularity_Iteration(offline_data,streaming_data,gra,target,Iteration):
 
     print('=> Iteration Number {}:         .Executing granularity:'.format(Iteration),gra)
     # Formmating  Data
@@ -414,7 +414,7 @@ def SODA_Granularity_Iteration(offline_data,streaming_data,gra,prob,Iteration):
     performance_thread = performance()
     performance_thread.start()
     
-    Input = {'GridSize':gra, 'StaticData':np.vstack((offline_data,streaming_data)), 'DistanceType': 'euclidean','PosteriorProbability':prob}
+    Input = {'GridSize':gra, 'StaticData':np.vstack((offline_data,streaming_data)), 'DistanceType': 'euclidean','Target':target}
 
     out = SODA.SelfOrganisedDirectionAwareDataPartitioning(Input,'Offline')
 
