@@ -74,7 +74,7 @@ def main():
     iterations = 33
 
     # Number of events
-    total = 10000
+    total = 100000
 
     # Percentage of background samples on the testing phase
     background_percent = 0.99
