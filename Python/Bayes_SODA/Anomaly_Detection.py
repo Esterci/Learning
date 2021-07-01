@@ -63,10 +63,10 @@ def main():
     # --------------------- INITIATION --------------------- #
     # ------------------------------------------------------ #
     ##########################################################
-    
+
     ### Define Granularities to run
     granularity = [1,2,3,4,5,6,7,8]
-    
+
     ### Define User Variables ###
     PROCESSES = 4
 
@@ -121,7 +121,7 @@ def main():
     for n_i in range(iterations):
 
         current_time = datetime.now().strftime("%H:%M:%S")
-    
+
         print('=> Iteration Number {}:         .Initiation time:'.format(n_i+1),current_time)
 
         # Divide data-set into training and testing sub-sets

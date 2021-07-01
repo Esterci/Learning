@@ -1,0 +1,14 @@
+Output_1.csv - Teste_10_2_21
+Output_2.csv - Teste_24_02_21
+Output_3.csv - Teste_10_2_21 + Teste_24_02_21
+Output_4.csv - Teste_10_2_21 + Teste_24_02_21 - TREINO
+Output_5.csv - Teste_10_2_21 + Teste_24_02_21 - TESTE
+Output_6.csv - Teste_10_2_21 + 1dB
+Output_7.csv - Teste_10_2_21 + 3dB
+Output_8.csv - Teste_10_2_21 + 5dB
+Output_9.csv - Autoencoder Gerado Pelo Teste_10_2_21 
+	     - ts=32, batch=16, epochs=100
+             - camada1=64, camada2=32
+Output_10.csv - Autoencoder + 1dB
+Output_11.csv - Autoencoder + 3dB
+Output_12.csv - Autoencoder + 5dB
