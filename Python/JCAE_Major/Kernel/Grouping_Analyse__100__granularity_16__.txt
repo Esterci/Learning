@@ -1,0 +1,6 @@
+granularity_16
+Number of data clouds: 44
+Number of good tools groups: 9
+Number of worn tools groups: 35
+Number of samples: 602
+---------------------------------------------------

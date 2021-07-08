@@ -1,0 +1,6 @@
+Kernel/SODA_label__100__6.00__.csv
+Number of data clouds: 6
+Number of good tools groups: 2
+Number of worn tools groups: 4
+Number of samples: 602
+---------------------------------------------------
