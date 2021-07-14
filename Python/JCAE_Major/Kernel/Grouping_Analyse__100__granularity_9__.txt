@@ -13,4 +13,54 @@ Number of data clouds: 13
 Number of good tools groups: 2
 Number of worn tools groups: 11
 Number of samples: 602
+---------------------------------------------------granularity_9
+Number of data clouds: 9
+Number of good tools groups: 2
+Number of worn tools groups: 7
+Number of samples: 601
+---------------------------------------------------granularity_9
+Number of data clouds: 9
+Number of good tools groups: 2
+Number of worn tools groups: 7
+Number of samples: 601
+---------------------------------------------------granularity_9
+Number of data clouds: 10
+Number of good tools groups: 2
+Number of worn tools groups: 8
+Number of samples: 602
+---------------------------------------------------granularity_9
+Number of data clouds: 11
+Number of good tools groups: 2
+Number of worn tools groups: 9
+Number of samples: 602
+---------------------------------------------------granularity_9
+Number of data clouds: 9
+Number of good tools groups: 2
+Number of worn tools groups: 7
+Number of samples: 602
+---------------------------------------------------granularity_9
+Number of data clouds: 11
+Number of good tools groups: 2
+Number of worn tools groups: 9
+Number of samples: 601
+---------------------------------------------------granularity_9
+Number of data clouds: 10
+Number of good tools groups: 2
+Number of worn tools groups: 8
+Number of samples: 601
+---------------------------------------------------granularity_9
+Number of data clouds: 9
+Number of good tools groups: 2
+Number of worn tools groups: 7
+Number of samples: 602
+---------------------------------------------------granularity_9
+Number of data clouds: 10
+Number of good tools groups: 2
+Number of worn tools groups: 8
+Number of samples: 602
+---------------------------------------------------granularity_9
+Number of data clouds: 10
+Number of good tools groups: 2
+Number of worn tools groups: 8
+Number of samples: 602
 ---------------------------------------------------

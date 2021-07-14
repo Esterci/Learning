@@ -1,0 +1,26 @@
+granularity_5
+Number of data clouds: 9
+Number of good tools groups: 7
+Number of worn tools groups: 2
+Number of samples: 473
+---------------------------------------------------granularity_5
+Number of data clouds: 8
+Number of good tools groups: 6
+Number of worn tools groups: 2
+Number of samples: 473
+---------------------------------------------------granularity_5
+Number of data clouds: 6
+Number of good tools groups: 3
+Number of worn tools groups: 3
+Number of samples: 474
+---------------------------------------------------granularity_5
+Number of data clouds: 4
+Number of good tools groups: 2
+Number of worn tools groups: 2
+Number of samples: 474
+---------------------------------------------------granularity_5
+Number of data clouds: 11
+Number of good tools groups: 9
+Number of worn tools groups: 2
+Number of samples: 474
+---------------------------------------------------

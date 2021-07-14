@@ -650,7 +650,7 @@ def tsfresh_chucksize(full_data,output_id):
     df = pd.DataFrame(np.concatenate((info,data), axis=1), columns= ['id','time'] + 
                         ['Sensor_' + str(x) for x in range(1,W-2)])
     
-    with open('Kernel/valid_features_dict.pkl', 'rb') as f:
+    with open('Kernel/valid_features_dict__' + output_id + '.pkl', 'rb') as f:
         kind_to_fc_parameters = pickle.load(f)
     
     columns = []
@@ -663,7 +663,7 @@ def tsfresh_chucksize(full_data,output_id):
         aux2 = tsfresh.extract_features(aux, column_id="id", column_sort="time",
                                         default_fc_parameters=kind_to_fc_parameters[x],
                                         #chunksize=3*24000, 
-                                        n_jobs=4,
+                                        n_jobs=0,
                                         disable_progressbar=False)
         for j in range(len(aux2.columns.tolist())):columns.append(aux2.columns.tolist()[j])
 
@@ -672,7 +672,7 @@ def tsfresh_chucksize(full_data,output_id):
         else:
             extracted_features = np.hstack((extracted_features,aux2.values))
 
-    final_features = pd.DataFrame(extracted_features,columns=columns)
+    final_features = impute(pd.DataFrame(extracted_features,columns=columns))
 
     filtered_features, relevance_table = selection.select_features(final_features, target, n_jobs=4)
     
@@ -700,12 +700,80 @@ def tsfresh_chucksize(full_data,output_id):
     
     return Output
 
+def tsfresh_extraction_chucksize(full_data,output_id):
+    # Loading the required input 
+    
+    L, W = full_data.shape
+
+    data = full_data[:,2:-1]
+    info = full_data[:,0:2]
+
+    # Normalizing
+    scaler = MinMaxScaler()
+    data = scaler.fit_transform(data)
+
+    n_measures = int(max(info[:,1]))
+
+    target = full_data[::n_measures,-1]
+
+    u, idx = np.unique(info[:,0], return_index=True)
+
+    df = pd.DataFrame(np.concatenate((info,data), axis=1), columns= ['id','time'] + 
+                        ['Sensor_' + str(x) for x in range(1,W-2)])
+    
+    with open('Kernel/valid_features_dict__' + output_id + '.pkl', 'rb') as f:
+        kind_to_fc_parameters = pickle.load(f)
+    
+    columns = []
+    
+    for i,x in enumerate(kind_to_fc_parameters):
+        aux = pd.DataFrame(np.hstack((df.loc[:,:'time'].values,
+                            df.loc[:,x].values.reshape((-1,1)))),
+                            columns=['id','time',x])
+        
+        aux2 = tsfresh.extract_features(aux, column_id="id", column_sort="time",
+                                        default_fc_parameters=kind_to_fc_parameters[x],
+                                        #chunksize=3*24000, 
+                                        n_jobs=4,
+                                        disable_progressbar=False)
+        for j in range(len(aux2.columns.tolist())):columns.append(aux2.columns.tolist()[j])
+
+        if i == 0:
+            extracted_features = np.array(aux2.values)
+        else:
+            extracted_features = np.hstack((extracted_features,aux2.values))
+
+    final_features = pd.DataFrame(extracted_features,columns=columns)
+    
+    with open('Kernel/final_target_' + output_id + '.pkl', 'wb') as f:
+        pickle.dump(target, f)
+
+    # Extracting the selected features dictionary from pandas data frame
+
+    kind_to_fc_parameters = tsfresh.feature_extraction.settings.from_columns(final_features)
+
+    # Saving dictionary for the on-line phase
+    
+    with open('Kernel/kind_to_fc_parameters.pkl', 'wb') as f:
+        pickle.dump(kind_to_fc_parameters, f)
+    
+    with open('Kernel/columns.pkl', 'wb') as f:
+        pickle.dump(final_features.columns.to_list(), f)
+        
+    Output = {'FeaturesFiltered': final_features,
+              'FinalTarget': target,
+              'ID': int(output_id)}
+    
+    return Output
+
 def tsfresh_chucksize_test(output_id):
     # Loading the required input 
     
     full_data = np.genfromtxt('Input/Output_' + output_id + '.csv',
                                 delimiter=',')
     
+    full_data = np.delete(full_data,len(full_data[0])-1,1)
+
     L, W = full_data.shape
 
     data = full_data[:,2:-1]
@@ -724,7 +792,7 @@ def tsfresh_chucksize_test(output_id):
     df = pd.DataFrame(np.concatenate((info,data), axis=1), columns= ['id','time'] + 
                         ['Sensor_' + str(x) for x in range(1,W-2)])
     
-    extracted_features = tsfresh.extract_features(df, column_id="id", column_sort="time", n_jobs=4)
+    extracted_features = tsfresh.extract_features(df, column_id="id", column_sort="time", n_jobs=0)
     
     return extracted_features
 
@@ -769,7 +837,7 @@ def tsfresh_NaN_filter(output_id,fft=False):
 
     valid_features_dict = from_columns(valid_features)
 
-    with open('Kernel/valid_features_dict.pkl', 'wb') as f:
+    with open('Kernel/valid_features_dict__' + output_id + '.pkl', 'wb') as f:
             pickle.dump(valid_features_dict, f)
 
     return
@@ -864,6 +932,73 @@ def tsfresh_ensemble(output_id):
     return Output
 
 def dynamic_tsfresh (total_data, mode='prototype'):
+    ''' Function for ONLINE mode
+    This function read the data from the acquisition module and executes a 
+    dynamic and lighter version of TSFRESH.
+    
+    Parameters:
+    ------
+    output_id : int 
+        identifier of the seed dataset
+    
+    extracted_names: list
+    
+    Returns: 
+    -------
+    dataframe #########################################################
+        
+
+    '''
+        
+
+    data = total_data[:,2:-1]
+    info = total_data[:,0:2]
+        
+    # Normalizing
+    scaler = MinMaxScaler()
+    data = scaler.fit_transform(data)
+
+    total_data = np.concatenate((info,data), axis=1)
+      
+    # ----------------------------------------------------------------- # 
+    df = pd.DataFrame(total_data, columns= ['id','time'] + 
+                        ['Sensor_' + str(x) for x in range(1,(total_data.shape[1]-1))])
+    
+    # Loading feature dictionary
+    with open('Kernel/kind_to_fc_parameters.pkl', 'rb') as f:
+        kind_to_fc_parameters = pickle.load(f)
+    
+    # Loading column names
+
+    with open('Kernel/columns.pkl', 'rb') as f:
+        original_columns = pickle.load(f)
+    
+    columns = []
+    
+
+    for i,x in enumerate(kind_to_fc_parameters):
+        aux = pd.DataFrame(np.hstack((df.loc[:,:'time'].values,
+                            df.loc[:,x].values.reshape((-1,1)))),
+                            columns=['id','time',x])
+        
+        aux2 = tsfresh.extract_features(aux, column_id="id", column_sort="time",
+                                        default_fc_parameters=kind_to_fc_parameters[x],#chunksize=24000, 
+                                        n_jobs=0
+                                        #disable_progressbar=True
+                                        )
+        for j in range(len(aux2.columns.tolist())):columns.append(aux2.columns.tolist()[j])
+
+        if i == 0:
+            extracted_features = np.array(aux2.values)
+        else:
+            extracted_features = np.hstack((extracted_features,aux2.values))
+
+    final_features = pd.DataFrame(extracted_features,columns=columns)
+    final_features = final_features[original_columns]
+
+    return impute(final_features)
+
+def dynamic_extraction_tsfresh (total_data, mode='prototype'):
     ''' Function for ONLINE mode
     This function read the data from the acquisition module and executes a 
     dynamic and lighter version of TSFRESH.
@@ -1032,7 +1167,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
         ax.tick_params(axis='x', labelsize=22)
         ax.tick_params(axis='y', labelsize=22)
         ax.grid()
-        #plt.show()
+        ##plt.show()
         fig.savefig('Percentage_of_Variance_Held__{}__{}.png'.format(Output_Id,it), bbox_inches='tight')
 
         print('Variation maintained: %.2f' % variacao_percentual_pca.sum())
@@ -1087,7 +1222,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
                     for axs in ax.flat:
                         axs.label_outer()
 
-                    plt.show()
+                    ##plt.show()
                     fig.savefig('Contribution_Percentage_Per_PC_{}.png'.format(Output_Id), bbox_inches='tight')
 
                 if (Chose == 'Analytics'):
@@ -1267,7 +1402,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
                     plt.tick_params(axis='y', labelsize=18)
                     ax.grid()
 
-                    plt.show()
+                    ##plt.show()
                     fig.savefig('Sensor_Weighted_Contribution_Percentage_{}.png'.format(Output_Id), bbox_inches='tight')
 
                     #Ploting Cntribution Features Results
@@ -1290,7 +1425,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
                     ax.xaxis.set_major_formatter(plt.FuncFormatter(format_func))
                     ax.grid()
 
-                    plt.show()
+                    ##plt.show()
                     fig.savefig('Features_Weighted_Contribution_Percentage_{}.png'.format(Output_Id), bbox_inches='tight')
 
 
@@ -1314,7 +1449,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
                     plt.tick_params(axis='y', labelsize=18)
                     ax.grid()
 
-                    plt.show()
+                    ##plt.show()
                     fig.savefig('{}th_Best_Features_Weighted_Contribution_Percentage_{}.png'.format(20,Output_Id), bbox_inches='tight')
 
                     ### Análise Geral para os 20 melhores atributos gerais ###
@@ -1337,7 +1472,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
                     plt.tick_params(axis='y', labelsize=18)
                     ax.grid()
                     ax.set_ylim([s[-1]-0.05,s[0]+0.05])
-                    plt.show()
+                    ##plt.show()
                     fig.savefig('{}th_Best_Features_Weighted_Contribution_Percentage_{}_zoom.png'.format(20,Output_Id), bbox_inches='tight')
 
 
@@ -1405,7 +1540,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
                     red_patch = mpatches.Patch(color='red', label='Non-Funcional Tools')
                     blue_patch = mpatches.Patch(color='blue', label='Funcional Tools')
                     plt.legend(handles=[red_patch,blue_patch],fontsize = 20)
-                    #plt.show()
+                    ##plt.show()
                     fig.savefig('ScatterPlot_PCA_{}.png'.format(Output_Id), bbox_inches='tight')
                     
                     # -------------------------------------------
@@ -1430,7 +1565,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
                     ax[2].set_ylabel('X3',fontsize = 20)
                     ax[2].grid()
                     
-                    #plt.show()
+                    ##plt.show()
                     fig.savefig('X1X2X3_{}.png'.format(Output_Id), bbox_inches='tight')
                     
                     
@@ -1487,7 +1622,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
             red_patch = mpatches.Patch(color='red', label='Non-Funcional Tools')
             blue_patch = mpatches.Patch(color='blue', label='Funcional Tools')
             plt.legend(handles=[red_patch,blue_patch],fontsize = 20)
-            #plt.show()
+            ##plt.show()
             fig.savefig('ScatterPlot_features__{}__{}.png'.format(Output_Id,it), bbox_inches='tight')
             
             # -------------------------------------------
@@ -1512,7 +1647,7 @@ def PCA_calc (SelectedFeatures,N_PCs,Chose = 'Analytics',it=0):
             ax[2].set_ylabel('PC3',fontsize = 20)
             ax[2].grid()
                     
-            #plt.show()
+            ##plt.show()
             fig.savefig('PC1PC2PC3__{}__{}.png'.format(Output_Id,it), bbox_inches='tight')
                     
                     
