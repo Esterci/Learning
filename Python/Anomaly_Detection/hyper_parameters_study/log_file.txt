@@ -1,0 +1,17 @@
+======= New Analysis 22-Aug-2021-11.16.16 ======
+
+.Train data shape: (70000, 21)
+.Test data shape: (30000, 21)
+.Test Background shape: (29700, 21)
+.Test Signal shape: (300, 21)
+.Number of events: 100000
+.Percentage of background samples on the testing phase: 0.99
+.Percentage of samples on the training phase: 0.3
+.Number of iterations: 33
+.Defining hyper-parameters ranges    
+.min_batch_size: 200    
+.max_batch_size: 500    
+.min_hidden_dim: 8    
+.max_hidden_dim: 21
+
+Iteration number 0 ==> 22-Aug-2021-11.16.16
