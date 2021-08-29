@@ -14,10 +14,10 @@ def get_model():
         model.add(Activation('tanh', name='output_for_training'))
         modelCol.append(model)
     
-    return modelCol
+    return  #lista de NN keras
 
 
-create_jobs(models = get_model(),
+create_jobs(models = get_model(), #passa lista de NN
             nInits = 1,
             nInitsPerJob = 1,
             sortBounds = 10,
