@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler,normalize, MinMaxScaler
 from sklearn.metrics import confusion_matrix, recall_score, accuracy_score, precision_score
 from keras.layers import Dense, Input, Concatenate, Flatten, BatchNormalization, Dropout, LeakyReLU
 from keras.models import Sequential, Model
-from keras.backend import clear_session
+from tensorflow.keras import backend as K
 from keras.losses import binary_crossentropy
 from Disco_tensor_flow import distance_corr
 from keras.optimizers import Adam
@@ -33,7 +33,6 @@ def decorr(var_1, var_2, weights,kappa):
         #return binary_crossentropy(y_true, y_pred)
 
     return loss
-
 
 #########################################################
 # ------------------------------------------------------ #
@@ -346,21 +345,28 @@ for it in range(n_it):
                                 
                                 # Predicting Test values
                                 
+                                start = datetime.now()
+
                                 test_x_predictions = autoencoder.predict([test_data,
                                                                         np.ones(len(test_data))]
                                                                         )
                                 # Calculating MSE
-                    
+
+                                end = datetime.now()
+
                                 mse = np.mean(np.power(test_data - test_x_predictions, 2), 
                                             axis=1
                                             )
                         
                                 # Creating MSE data frame
                         
-                                error_df = pd.DataFrame({'Reconstruction_error': mse,
-                                                        'Class': test_labels
+                                error_df = pd.DataFrame({'reconstruction_error': mse,
+                                                        'class': test_labels,
+                                                        'time' : end -start
                                                         }
                                                     )
+
+                                # Creating 
                                 # Concatenating with the original Attributes
                                 
                                 results_df = pd.concat([test_df,error_df],
@@ -394,8 +400,11 @@ for it in range(n_it):
 
                             combinations_count += 1
 
+                            K.clear_session()
+
                             with open('log_file.txt', 'a') as f:
                                 f.writelines('\n    .{} of {} combinations at '.format(combinations_count,n_combinations) + time_stamp())
+
 
 with open('log_file.txt', 'a') as f:
     f.writelines('\n======== Analysis Complete ' + time_stamp() + ' =========')
