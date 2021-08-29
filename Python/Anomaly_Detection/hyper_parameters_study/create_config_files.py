@@ -114,7 +114,7 @@ creator = create_configuration_jobs(models = get_model(min_batch_size,
                                     nInitsPerJob = 1,
                                     sortBounds = 10,
                                     nSortsPerJob = 1,
-                                    nModelsPerJob = 1,
+                                    nModelsPerJob = 6,
                                     outputFolder = 'job_test2')
 
 creator.create_jobs()
