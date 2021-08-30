@@ -12,8 +12,7 @@ from sklearn.metrics import confusion_matrix, recall_score, accuracy_score, prec
 from keras.layers import Dense, Input, Concatenate, Flatten, BatchNormalization, Dropout, LeakyReLU
 from keras.models import Sequential, Model
 from tensorflow.keras import backend as K
-from keras.losses import binary_crossentropy
-from Disco_tensor_flow import distance_corr
+from Disco_tensor_flow import decorr
 from keras.optimizers import Adam
 from sklearn.metrics import roc_auc_score
 from datetime import datetime, time
@@ -22,17 +21,6 @@ def time_stamp():
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("%d-%b-%Y-%H.%M.%S")
     return timestampStr
-
-# define new loss with distance decorrelation
-def decorr(var_1, var_2, weights,kappa):
-
-    def loss(y_true, y_pred):
-        #return binary_crossentropy(y_true, y_pred) + distance_corr(var_1, var_2, weights)
-        #return distance_corr(var_1, var_2, weights)
-        return binary_crossentropy(y_true, y_pred) + kappa * distance_corr(var_1, var_2, weights,power=2)
-        #return binary_crossentropy(y_true, y_pred)
-
-    return loss
 
 #########################################################
 # ------------------------------------------------------ #
@@ -152,7 +140,7 @@ attributes = np.array(["px1",
                         "C",
                         "HT",
                         "A"]
-                      )
+                    )
 
 test_df = pd.DataFrame(test_data,columns = attributes)
 
@@ -307,7 +295,7 @@ for it in range(n_it):
                             
                             # Compiling NN
                             
-                            opt = Adam(lr=learning_rate)
+                            opt = Adam(lr=0.001)
                             autoencoder.compile(optimizer=opt, 
                                                 loss=decorr(input_layer[:,15], 
                                                             decoder[:,15], 

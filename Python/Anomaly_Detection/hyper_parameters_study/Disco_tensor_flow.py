@@ -1,4 +1,6 @@
 import tensorflow as tf
+from keras.losses import binary_crossentropy
+
 
 def distance_corr(var_1, var_2, normedweight, power=1):
     """var_1: First variable to decorrelate (eg mass)
@@ -57,3 +59,15 @@ def distance_corr(var_1, var_2, normedweight, power=1):
   
     return dCorr
 
+
+def decorr(var_1, var_2, weights,kappa):
+
+    def loss(y_true, y_pred):
+        #return binary_crossentropy(y_true, y_pred) + distance_corr(var_1, var_2, weights)
+        #return distance_corr(var_1, var_2, weights)
+        return binary_crossentropy(y_true, y_pred) + kappa * distance_corr(var_1, var_2, weights,power=2)
+        #return binary_crossentropy(y_true, y_pred)
+
+    return loss
+
+    

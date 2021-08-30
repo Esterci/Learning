@@ -1,4 +1,4 @@
-======= New Analysis 29-Aug-2021-11.47.44 ======
+======= New Analysis 29-Aug-2021-21.25.43 ======
 
 .Train data shape: (70000, 21)
 .Test data shape: (30000, 21)
@@ -14,6 +14,4 @@
 .min_hidden_dim: 8    
 .max_hidden_dim: 21
 
-Iteration number 0 ==> 29-Aug-2021-11.47.44
-    .1 of 729 combinations at 29-ago-2021-11.54.22
-    .2 of 729 combinations at 29-ago-2021-11.54.32
+Iteration number 0 ==> 29-Aug-2021-21.25.43
