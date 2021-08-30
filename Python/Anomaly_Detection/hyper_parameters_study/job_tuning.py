@@ -49,6 +49,9 @@ batch_size_list = list(np.linspace(min_batch_size,max_batch_size,num=1,dtype=int
 
 lambda_disco_list = list(np.linspace(max_lambda,min_lambda,num=1,dtype=int))
 
+print(batch_size_list)
+print(lambda_disco_list)
+
 job_id = getJobConfigId( args.configFile )
 
 for l_disco in lambda_disco_list:

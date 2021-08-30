@@ -273,9 +273,9 @@ class AutoencoderReconsturctionJob( Logger ):
                     try:
                         opt = Adam(lr=0.001)
                         model_for_this_init.compile( opt,
-                                    loss=decorr(input_layer[:,15], 
-                                                decoder[:,15], 
-                                                sample_weights[:,0],
+                                    loss=decorr(model_for_this_init.input_layer[:,15], 
+                                                model_for_this_init.decoder[:,15], 
+                                                model_for_this_init.sample_weights[:,0],
                                                 self.lambda_disco),
                                     # protection for functions or classes with internal variables
                                     # this copy avoid the current training effect the next one.

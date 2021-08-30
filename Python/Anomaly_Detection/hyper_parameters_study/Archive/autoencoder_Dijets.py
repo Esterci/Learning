@@ -218,7 +218,7 @@ for it in range(n_it):
 
                             # Fixed parameters
 
-                            nb_epoch = 100
+                            nb_epoch = 10
                             input_dim = train_data.shape[1]
                             hidden_dim_1 = int(encoding_dim / 2)
                             hidden_dim_2 = int(hidden_dim_1 / 2)
@@ -331,6 +331,10 @@ for it in range(n_it):
                                             bbox_inches='tight'
                                         )
                                 
+                                del fig
+                                del ax
+                                plt.close()
+                                
                                 # Predicting Test values
                                 
                                 start = datetime.now()
@@ -381,6 +385,10 @@ for it in range(n_it):
                                             bbox_inches='tight'
                                         )
 
+                                del fig
+                                del ax
+                                plt.close()
+
                             except:
                                 results_df.to_csv('Results/results__' + struct_name + '__.csv')
                                 with open('Error__' + struct_name + '.txt', 'w') as f:
@@ -388,11 +396,26 @@ for it in range(n_it):
 
                             combinations_count += 1
 
-                            K.clear_session()
-
                             with open('log_file.txt', 'a') as f:
                                 f.writelines('\n    .{} of {} combinations at '.format(combinations_count,n_combinations) + time_stamp())
 
+                            # Clear everything for the next init
+                            K.clear_session()
+         
+                        # Clear everything for the next init
+                        K.clear_session()
+                            
+                    # Clear everything for the next init
+                    K.clear_session()
+                            
+                # Clear everything for the next init
+                K.clear_session()
+
+            # Clear everything for the next init
+            K.clear_session()
+
+        # Clear everything for the next init
+        K.clear_session()        
 
 with open('log_file.txt', 'a') as f:
     f.writelines('\n======== Analysis Complete ' + time_stamp() + ' =========')
