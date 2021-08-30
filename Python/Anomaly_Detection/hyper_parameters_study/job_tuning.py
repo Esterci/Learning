@@ -8,7 +8,7 @@ def getJobConfigId( path ):
 
 import argparse
 import sys,os
-
+import numpy as np
 
 parser = argparse.ArgumentParser(description = '', add_help = False)
 parser = argparse.ArgumentParser()
@@ -29,54 +29,74 @@ if len(sys.argv)==1:
 
 args = parser.parse_args()
 
+##########################################################
+# ------------------------------------------------------ #
+# --------------------- INITIATION --------------------- #
+# ------------------------------------------------------ #
+##########################################################
 
-try:
+# Defining hyper-parameters range
 
-  job_id = getJobConfigId( args.configFile )
-  
-  
-  outputFile = args.volume+'/tunedDiscr.jobID_%s'%str(job_id).zfill(4) if args.volume else 'test.jobId_%s'%str(job_id).zfill(4)
-  
-  from tensorflow.keras.callbacks import EarlyStopping
-  import tensorflow as tf
-  stop = EarlyStopping(monitor='val_sp', mode='max', verbose=1, patience=25, restore_best_weights=True)
+min_batch_size = 200
 
-  import datetime, os
-  from tensorflow.keras.callbacks import TensorBoard
-  logdir = os.path.join('.', 'logs/%s' %(datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
-  tensorboard = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
+max_batch_size = 500
 
-  #from saphyra.applications import BinaryClassificationJob
-  from AutoencoderReconsturctionJob import AutoencoderReconsturctionJob
-  
-  
-  job = AutoencoderReconsturctionJob( job               = args.configFile,
-                                  metrics           = ['accuracy'],
-                                  callbacks         = [stop, tensorboard],
-                                  epochs            = 50,
-                                  outputFile        = outputFile )
+min_lambda = 0
 
-  ############# AQUI É ONDE EU DEVO ADICIONAR O OPTIMIZER (optimizer = 'adam')
-  # modificar o ADAM com o SetMembership e ele sera um parametro da função BinaryClassificationJob
+max_lambda = 600
 
-  # Run it!
-  job.run()
-  
-  
-  # necessary to work on orchestra
-  #from saphyra import lock_as_completed_job
-  #lock_as_completed_job(args.volume if args.volume else '.')
-  
-  sys.exit(0)
+batch_size_list = list(np.linspace(min_batch_size,max_batch_size,num=1,dtype=int))
 
-except  Exception as e:
-  print(e)
+lambda_disco_list = list(np.linspace(max_lambda,min_lambda,num=1,dtype=int))
 
-  # necessary to work on orchestra
-  #from saphyra import lock_as_failed_job
-  #lock_as_failed_job(args.volume if args.volume else '.')
+job_id = getJobConfigId( args.configFile )
 
-  sys.exit(1)
+for l_disco in lambda_disco_list:
+  for batch in batch_size_list:
+
+    try:
+
+      outputFile = args.volume+'/tunedDiscr.jobID_%s'%str(job_id).zfill(4) if args.volume else 'test.jobId_%s'%str(job_id).zfill(4)
+
+      from tensorflow.keras.callbacks import EarlyStopping
+      import tensorflow as tf
+      stop = EarlyStopping(monitor='val_sp', mode='max', verbose=1, patience=25, restore_best_weights=True)
+
+      import datetime, os
+      from tensorflow.keras.callbacks import TensorBoard
+      logdir = os.path.join('.', 'logs/%s' %(datetime.datetime.now().strftime("%Y%m%d-%H%M%S")))
+      tensorboard = tf.keras.callbacks.TensorBoard(logdir, histogram_freq=1)
+
+      #from saphyra.applications import BinaryClassificationJob
+      from AutoencoderReconsturctionJob import AutoencoderReconsturctionJob
+
+
+      job = AutoencoderReconsturctionJob( job               = args.configFile,
+                                          epochs        = 150,
+                                          batch_size    = batch,
+                                          lambda_disco  = l_disco,
+                                          metrics           = ['accuracy'],
+                                          callbacks         = [stop, tensorboard],
+                                          outputFile        = outputFile )
+
+      # Run it!
+      job.run()
+
+
+      # necessary to work on orchestra
+      from saphyra import lock_as_completed_job
+      lock_as_completed_job(args.volume if args.volume else '.')
+
+      sys.exit(0)
+
+    except  Exception as e:
+      print(e)
+
+      # necessary to work on orchestra
+      from saphyra import lock_as_failed_job
+      lock_as_failed_job(args.volume if args.volume else '.')
+
+      sys.exit(1)
 
 
 

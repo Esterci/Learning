@@ -258,11 +258,13 @@ class AutoencoderReconsturctionJob( Logger ):
                                     'lambda_disco' + '__' + str(self.lambda_disco) + '__' +
                                     'ID' + '__' + str(self.__jobId ) + '__' +
                                     time_stamp() + '__')
+                    
+                    MSG_INFO( self,struct_name)
 
-                    print(model)
+                    MSG_INFO( self,model)
                     # get the model "ptr" for this sort, init and model index
                     if self.__model_generator:
-                        print(  "Apply model generator..." )
+                        MSG_INFO( self,  "Apply model generator..." )
                         model_for_this_init = self.__model_generator( sort )
                     else: 
                         model_for_this_init = clone_model(model) # get only the model
@@ -282,103 +284,83 @@ class AutoencoderReconsturctionJob( Logger ):
                                     )
                         model_for_this_init.summary()
                     except RuntimeError as e:
-                        print("Compilation model error: %s" , e)
+                        MSG_INFO( self,"Compilation model error: %s" , e)
 
 
-                    print("Training model id (%d) using sort (%d) and init (%d)", self.__id_models[imodel], sort, init )
+                    MSG_INFO( self,"Training model id (%d) using sort (%d) and init (%d)", self.__id_models[imodel], sort, init )
 
                     callbacks = deepcopy(self.callbacks)
 
                     
                     # Hacn: used by orchestra to set this job as local test
                     if os.getenv('LOCAL_TEST'): 
-                        print(  "The LOCAL_TEST environ was detected." )
-                        print(  "This is a short local test, lets skip the fitting for now. ")
+                        MSG_INFO( self,  "The LOCAL_TEST environ was detected." )
+                        MSG_INFO( self,  "This is a short local test, lets skip the fitting for now. ")
                         return StatusCode.SUCCESS
 
-                    try:
 
-                        Train = [train_data, np.ones(len(train_data))]
+                    Train = [train_data, np.ones(len(train_data))]
 
-                        # Training
-                        history = model_for_this_init.fit(x = Train, 
-                                            y = train_data,
-                                            epochs          = self.epochs,
-                                            batch_size      = self.batch_size,
-                                            verbose         = self.__verbose,
-                                            validation_split= 0.1,
-                                            callbacks       = callbacks,
-                                            shuffle         = True).history
+                    # Training
+                    history = model_for_this_init.fit(x = Train, 
+                                        y = train_data,
+                                        epochs          = self.epochs,
+                                        batch_size      = self.batch_size,
+                                        verbose         = self.__verbose,
+                                        validation_split= 0.1,
+                                        callbacks       = callbacks,
+                                        shuffle         = True).history
 
 
-                        # Ploting Model Loss
+                    # Ploting Model Loss
 
-                        fig, ax = plt.subplots()
-                        plt.plot(history['loss'], linewidth=2, label='Train')
-                        plt.plot(history['val_loss'], linewidth=2, label='Test')
-                        plt.legend(loc='upper right')
-                        plt.title('Model loss')
-                        plt.ylabel('Loss')
-                        plt.xlabel('Epoch')
-                        
-                        fig.savefig('Figures/model-loss__' + struct_name + '__.png', 
-                                    bbox_inches='tight'
+                    fig, ax = plt.subplots()
+                    plt.plot(history['loss'], linewidth=2, label='Train')
+                    plt.plot(history['val_loss'], linewidth=2, label='Test')
+                    plt.legend(loc='upper right')
+                    plt.title('Model loss')
+                    plt.ylabel('Loss')
+                    plt.xlabel('Epoch')
+                    
+                    fig.savefig('Figures/model-loss__' + struct_name + '__.png', 
+                                bbox_inches='tight'
+                            )
+                    
+                    del fig
+                    del ax
+                    plt.close()
+                    
+                    # Predicting Test values
+                    
+                    start = datetime.now()
+
+                    test_x_predictions = model_for_this_init.predict([test_data,
+                                                                    np.ones(len(test_data))])
+                    # Calculating MSE
+
+                    end = datetime.now()
+
+                    mse = np.mean(np.power(test_data - test_x_predictions, 2), 
+                                axis=1
                                 )
-                        
-                        # Predicting Test values
-                        
-                        start = datetime.now()
+            
+                    # Creating MSE data frame
+            
+                    error_df = pd.DataFrame({'reconstruction_error': mse,
+                                            'class': test_labels,
+                                            'time' : end -start
+                                            }
+                                        )
 
-                        test_x_predictions = model_for_this_init.predict([test_data,
-                                                                        np.ones(len(test_data))])
-                        # Calculating MSE
-
-                        end = datetime.now()
-
-                        mse = np.mean(np.power(test_data - test_x_predictions, 2), 
-                                    axis=1
-                                    )
-                
-                        # Creating MSE data frame
-                
-                        error_df = pd.DataFrame({'reconstruction_error': mse,
-                                                'class': test_labels,
-                                                'time' : end -start
-                                                }
-                                            )
-
-                        # Concatenating with the original Attributes
-                        
-                        results_df = pd.concat([test_df,error_df],
-                                            axis=1
-                                            )
-                        
-                        # Saving Results
-                        
-                        results_df.to_csv('Results/results__' + struct_name + '__.csv')
-
-                        # Ploting Reconstitution error
-                        
-                        groups = error_df.groupby('Class')
-                        fig, ax = plt.subplots()
-                        for name, group in groups:
-                            ax.plot(group.index, group.Reconstruction_error, marker='o', ms=3.5, linestyle='',
-                                    label= "Signal" if name == 1 else "Background")
-                        ax.legend()
-                        plt.title("Reconstruction error")
-                        plt.ylabel("Reconstruction error")
-                        plt.xlabel("Data point index")
-                        
-                        fig.savefig('Figures/reconstruction-error__' + struct_name + '__.png', 
-                                    bbox_inches='tight'
-                                )
-
-                    except:
-                        with open('Results/Error__' + struct_name + '.txt', 'w') as f:
-                            f.write('error')
-
-
-                    self.history = history
+                    # Concatenating with the original Attributes
+                    
+                    results_df = pd.concat([test_df,error_df],
+                                        axis=1
+                                        )
+                    
+                    # Saving Results
+                    
+                    results_df.to_csv('Results/results__' + struct_name + '__.csv')
 
                     # Clear everything for the next init
                     K.clear_session()
