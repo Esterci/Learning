@@ -227,10 +227,10 @@ try:
 
     # Ploting Reconstitution error
     
-    groups = error_df.groupby('Class')
+    groups = error_df.groupby('class')
     fig, ax = plt.subplots()
     for name, group in groups:
-        ax.plot(group.index, group.Reconstruction_error, marker='o', ms=3.5, linestyle='',
+        ax.plot(group.index, group.reconstruction_error, marker='o', ms=3.5, linestyle='',
                 label= "Signal" if name == 1 else "Background")
     ax.legend()
     plt.title("Reconstruction error")
