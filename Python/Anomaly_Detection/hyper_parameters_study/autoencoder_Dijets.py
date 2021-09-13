@@ -48,6 +48,10 @@ parser.add_argument('-a3','--act_3', action='store',
         dest='act_3', required = False, default = None,
             help = "The volume output.")
 
+parser.add_argument('-dcorr','--dcorr', action='store',
+        dest='dcorr', required = False, default = None,
+            help = "The volume output.")
+
 parser.add_argument('-f','--file', action='store',
         dest='file', required = False, default = None,
             help = "The volume output.")
@@ -57,6 +61,7 @@ args = parser.parse_args()
 batch_size = int(args.batch_size)
 encoding_dim = int(args.encoding_dim)
 lambda_disco = int(args.lambda_disco)
+dcorr = int(args.dcorr)
 act_1 = args.act_1
 act_2 = args.act_2
 act_3 = args.act_3
@@ -157,8 +162,8 @@ early_stop = tf.keras.callbacks.EarlyStopping(
 
 opt = Adam(lr=0.001)
 autoencoder.compile(optimizer=opt, 
-                    loss=decorr(input_layer[:,15], 
-                                decoder[:,15], 
+                    loss=decorr(input_layer[:,dcorr], 
+                                decoder[:,dcorr], 
                                 sample_weights[:,0],
                                 lambda_disco)
                 )
@@ -202,15 +207,17 @@ try:
 
     end = datetime.now()
 
-    mse = np.mean(np.power(test_data - test_x_predictions, 2), 
-                axis=1
-                )
+    error = np.power(np.power(test_data - test_x_predictions, 2),0.5)
 
     # Creating MSE data frame
+    columns = ["px1","py1","pz1","E1","eta1",
+                "phi1","pt1","px2","py2","pz2",
+                "E2","eta2","phi2","pt2","Delta_R",
+                "M12","MET","S","C","HT","A"]
+    error_df = pd.DataFrame(error,columns=columns)
 
-    error_df = pd.DataFrame({'reconstruction_error': mse,
-                            'class': test_labels,
-                            'time' : end -start
+    id_df = pd.DataFrame({'class': test_labels,
+                          'time' : end -start
                             }
                         )
 
