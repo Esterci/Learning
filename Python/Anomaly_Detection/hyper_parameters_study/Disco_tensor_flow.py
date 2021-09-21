@@ -2,7 +2,6 @@ import tensorflow as tf
 from keras.losses import binary_crossentropy
 
 
-def distance_corr(var_1, var_2, normedweight, power=1):
     """var_1: First variable to decorrelate (eg mass)
     var_2: Second variable to decorrelate (eg classifier output)
     normedweight: Per-example weight. Sum of weights should add up to N (where N is the number of examples)
