@@ -134,12 +134,11 @@ for it in range(n_it):
 
     print('=*='*17 )
 
-    Output = {'train_data'  : train_data,
-              'test_data'   : test_data,
+    Output = {'train_df'  : train_data,
               'test_df'     : test_df,
               'test_labels' : test_labels}
 
-    struct_name = ('Data_Base/data__total__' + str(total) +
+    struct_name = ('data-divisions/data__total__' + str(total) +
                    '__background_percent__' + str(background_percent) +
                    '__test_size__' + str(test_size) +
                    '__n_it__' + str(it) + '__.pkl')
