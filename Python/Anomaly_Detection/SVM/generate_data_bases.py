@@ -5,7 +5,7 @@ from sklearn.preprocessing import normalize
 import pickle as pk
 
 
-#########################################################
+##########################################################
 # ------------------------------------------------------ #
 # ----------------------- LOADING ---------------------- #
 # ------------------------------------------------------ #
@@ -58,27 +58,22 @@ for it in range(n_it):
     print('\n      ==== Commencing Pre-processing ====\n')
 
     # Percentage of background samples to divide the data-set
-
     dat_set_percent = total/len(background)
 
-
     # Reducing background samples
-
     _,reduced_background = train_test_split(background, test_size=dat_set_percent)
-
 
     # Deviding train and test background
 
     background_train, background_test = train_test_split(reduced_background, test_size=test_size)
 
-
-    # Iserting the correct number of signal in training
+    # Iserting the correct number of signal in streaming
 
     n_signal_samples = int(len(background_train)*(1-background_percent))
 
     _,background_train = train_test_split(background_train, test_size=background_percent)
 
-    _,signal_train= train_test_split(signal, test_size=n_signal_samples/len(signal))
+    _,signal_train = train_test_split(signal, test_size=n_signal_samples/len(signal))
 
 
     # Concatenating Signal and the Background sub-sets
@@ -93,7 +88,6 @@ for it in range(n_it):
     _,background_test = train_test_split(background_test, test_size=background_percent)
 
     _,signal_test = train_test_split(signal, test_size=n_signal_samples/len(signal))
-
 
     # Concatenating Signal and the Background sub-sets
 
@@ -114,8 +108,7 @@ for it in range(n_it):
                             axis=0
                         )
 
-
-    # Creates test data frame
+    # Creates test and train data frames
 
     attributes = np.array(["px1",
                             "py1",
@@ -140,22 +133,22 @@ for it in range(n_it):
                             "A"]
                         )
 
-    test_df = pd.DataFrame(test_data,columns = attributes)
-
     train_df = pd.DataFrame(train_data,columns = attributes)
+
+    test_df = pd.DataFrame(test_data,columns = attributes)
 
 
     # Creating Labels
 
     print('.Creating Labels')
 
-    test_labels =np.ones((len(test_data)))
-
-    test_labels[:len(background_test)] = 0
-
     train_labels =np.ones((len(train_data)))
 
     train_labels[:len(background_train)] = 0
+
+    test_labels =np.ones((len(test_data)))
+
+    test_labels[:len(background_test)] = 0
 
 
     print('\n      ==== Pre-processing Complete ====\n')
@@ -166,17 +159,15 @@ for it in range(n_it):
     print('=*='*17 )
 
 
-    Output = {'train_df'  : train_df,
+    Output = {'train_df'  : train_data,
               'test_df'     : test_df,
-              'test_labels' : test_labels,
-              'train_labels' : train_labels
-              }
+              'test_labels' : test_labels}
 
     struct_name = ('data-divisions/data__total__' + str(total) +
                    '__background_percent__' + str(background_percent) +
                    '__test_size__' + str(test_size) +
                    '__n_it__' + str(it) + '__.pkl')
-                   
+    
     
     with open(struct_name, 'wb') as f:
         pk.dump(Output, f)
