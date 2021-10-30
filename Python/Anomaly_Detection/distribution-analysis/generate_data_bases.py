@@ -156,7 +156,7 @@ if prob == False:
 
         # Creating Labels
 
-        test_labels =np.ones((len(test_data)))
+        test_labels = np.ones((len(test_data)))
 
         test_labels[:len(background_test)] = 0
 
