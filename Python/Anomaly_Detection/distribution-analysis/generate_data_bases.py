@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import normalize
+from sklearn.preprocessing import MinMaxScaler
 import pickle as pk
 import sys
 from scipy import stats
@@ -42,7 +42,7 @@ print('=*='*17 )
 ##########################################################
 
 # Number of events
-total = 50000
+total = 100000
 
 # Percentage of background samples on the testing phase
 background_percent = 0.99
@@ -136,15 +136,11 @@ if prob == False:
 
         # Normalize Data
 
-        test_data = normalize(test_data,
-                                norm='max',
-                                axis=0
-                            )
+        scaler = MinMaxScaler()
 
-        train_data = normalize(train_data,
-                                norm='max',
-                                axis=0
-                            )
+        test_data = scaler.fit_transform(test_data)
+
+        train_data = scaler.fit_transfor(train_data)
 
 
         # Creates test data frame
@@ -353,10 +349,9 @@ else:
 
     # Normalize Data
 
-    data = normalize(data,
-                    norm='max',
-                    axis=0
-                )
+    scaler = MinMaxScaler()
+
+    data = scaler.fit_transform(data)
 
 
     # Creates test data frame
