@@ -59,7 +59,7 @@ for i,file_name in enumerate(file_list):
 print('\n\nInitiating SODA\n')
 
 
-data = divisions_dict[0]['test_df'].values
+data = divisions_dict[0]['test_df']
 
 SODA_input = {
     'StaticData' : data[0:100],
@@ -67,24 +67,19 @@ SODA_input = {
     'DistanceType' : 'euclidean'
 }
 
-
 SODA(SODA_input)
 
-
-SODA_dict = {}
 
 print('\n\nList of granularities to study: {}\n'.format(granularities))
 
 for gra in granularities:
 
-    SODA_dict[gra] = {}
-
     for div in divisions_dict:
 
-        data = divisions_dict[div]['test_df'].values
+        data = divisions_dict[div]['test_df']
 
         SODA_input = {
-            'StaticData' : data,
+            'StaticData' : data[:],
             'GridSize' : gra,
             'DistanceType' : 'euclidean'
         }
@@ -92,12 +87,12 @@ for gra in granularities:
         print('\n\nAppling SODA with granularity {} on division {}...\n'.format(gra,div))
 
 
-        SODA_dict[gra][div] = SODA(SODA_input)
+        output = SODA(SODA_input)
 
 
-struct_name = 'results__.pkl'
-                    
+        struct_name = 'outputs/granularity__{}__iteration__{}__.pkl'.format(gra,div)
+                            
 
-with open(struct_name, 'wb') as f:
-    pk.dump(SODA_dict, f)
+        with open(struct_name, 'wb') as f:
+            pk.dump(output, f)
 

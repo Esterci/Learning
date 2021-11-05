@@ -16,19 +16,24 @@ from scipy import stats
 # are the column names, in order to avoid NaN values in 
 # the array.
 
+
+### defining attributes used in the study
+
+use_att = [3,10,14,15,16,17,18]
+
 print('==== Commencing Initiation ====\n')
 
 ### Background
 b_name='/home/thiago/Documents/Data_Sets/LPC-anomaly-detection/Input_Background_1.csv'
 background = np.genfromtxt(b_name, delimiter=',')
-background = background[1:,:]
+background = background[1:,use_att]
 print(".Background Loaded..." )
 print(".Background shape: {}".format(background.shape))
 
 ### Signal
 s_name='/home/thiago/Documents/Data_Sets/LPC-anomaly-detection/Input_Signal_1.csv'
 signal = np.genfromtxt(s_name, delimiter=',')
-signal = signal[1:,:]
+signal = signal[1:,use_att]
 print(".Signal Loaded...")
 print(".Signal shape: {}\n".format(signal.shape))
 
@@ -42,7 +47,7 @@ print('=*='*17 )
 ##########################################################
 
 # Number of events
-total = 100000
+total = 500000
 
 # Percentage of background samples on the testing phase
 background_percent = 0.99
@@ -56,8 +61,7 @@ n_it = 33
 
 # Defining type of division
 
-prob = True
-
+prob = False
 
 attributes = ["px1","py1","pz1","E1","eta1",
                 "phi1","pt1","px2","py2","pz2",
@@ -140,14 +144,7 @@ if prob == False:
 
         test_data = scaler.fit_transform(test_data)
 
-        train_data = scaler.fit_transfor(train_data)
-
-
-        # Creates test data frame
-
-        test_df = pd.DataFrame(test_data,columns = attributes)
-
-        train_df = pd.DataFrame(train_data,columns = attributes)
+        train_data = scaler.fit_transform(train_data)
 
 
         # Creating Labels
@@ -161,8 +158,8 @@ if prob == False:
         train_labels[:len(background_train)] = 0
 
 
-        Output = {'train_df'  : train_df,
-                'test_df'     : test_df,
+        Output = {'train_df'  : train_data,
+                'test_df'     : test_data,
                 'test_labels' : test_labels,
                 'train_labels' : train_labels
                 }
@@ -354,11 +351,6 @@ else:
     data = scaler.fit_transform(data)
 
 
-    # Creates test data frame
-
-    df = pd.DataFrame(data,columns = attributes)
-
-
     # Creating Labels
 
     labels =np.ones((len(data)))
@@ -366,7 +358,7 @@ else:
     labels[:len(reduced_background)] = 0
     
 
-    Output = {'df'  : df,
+    Output = {'df'  : data,
             'labels' : labels
             }
 
