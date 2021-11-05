@@ -3,7 +3,6 @@ import pickle as pk
 import sys
 from SODA_numba import SelfOrganisedDirectionAwareDataPartitioning as SODA
 import numpy as np
-from sklearn.datasets import load_iris
 
 
 ### defining granularities to study
