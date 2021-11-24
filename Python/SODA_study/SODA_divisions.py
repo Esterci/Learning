@@ -12,6 +12,7 @@ granularities = [2,4,6,8]
 ### creates a dictionary for the divisions
 
 # define the paths into the container
+
 data_path  = '/home/thiago/Repositories/Learning/Python/Anomaly_Detection/distribution-analysis/data/divisions/*'
 
 # create a list of config files
@@ -59,7 +60,7 @@ for i,file_name in enumerate(file_list):
 print('\n\nInitiating SODA\n')
 
 
-data = divisions_dict[0]['test_df']
+data = divisions_dict[0]['train_df']
 
 SODA_input = {
     'StaticData' : data[0:100],
@@ -76,7 +77,7 @@ for gra in granularities:
 
     for div in divisions_dict:
 
-        data = divisions_dict[div]['test_df']
+        data = divisions_dict[div]['train_df']
 
         SODA_input = {
             'StaticData' : data[:],

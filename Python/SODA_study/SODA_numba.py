@@ -174,6 +174,62 @@ def hand_dist(XA,XB):
     return distance
 
 
+#@njit(fastmath = True)
+def relative_pi_calculator(XA,XB):   
+    '''
+    # Euclidean and Cosine distance between one sample (XA) and a set of samples (XB)
+    '''
+
+    # geting matrices dimensionality
+
+    LA, W = XA.shape
+
+    LB, _ = XB.shape
+
+    cumulative_euclidean = []
+
+    cumulative_cosine = []
+
+    euclidean_density = []
+
+    cosine_density = []
+
+    for i in range(LA):
+
+        euclidean = []
+
+        cosine = []
+
+        for j in range(LB):
+
+            aux = 0 # Euclidean
+            dot = 0 # Cosine
+            denom_a = 0 # Cosine
+            denom_b = 0 # Cosine
+
+            for k in range(W):
+
+                aux += ((XA[i,k]-XB[j,k])**2) # Euclidean
+                dot += (XA[i,k]*XB[j,k]) # Cosine
+                denom_a += (XA[i,k] * XA[i,k]) # Cosine
+                denom_b += (XB[j,k] * XB[j,k]) # Cosine
+
+            euclidean.append((aux**0.5)**2)
+            
+            cosine.append((1 - (dot / ((denom_a ** 0.5) * (denom_b ** 0.5))))**2)
+            
+
+        cumulative_euclidean.append(sum(euclidean))
+
+        cumulative_cosine.append(sum(cosine))
+
+    euclidean_density.append(sum(cumulative_euclidean)/(2*cumulative_euclidean))
+
+    cosine_density.append(sum(cumulative_cosine)/(2*cumulative_cosine))
+        
+    return euclidean_density, cosine_density
+
+
 @njit
 def chessboard_division_njit(Uniquesample, MMtypicality, grid_trad, grid_angl, distancetype):
     '''
