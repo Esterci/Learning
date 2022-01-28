@@ -1,0 +1,56 @@
+Criar BD:
+
+	$ create database <nome>;
+
+Tipos Primitivos:
+	
+	.numérico:
+		.Inteiro -> TinyInt,SmallInt,Int,MediumInt,BigInt;
+		.Real -> Decimal,Float,Double,Real;
+		.Lógico -> Bit,Boolean;
+
+	.Data/Tempo -> Date,DateTime,TimeStamp,Time,Year;
+
+	.Literal:
+		.Caractere -> Char,VarChar;
+		.Texto -> TinyText,Text,MediumText,LongText;
+		.Binário -> TinyBlob,Blob,MediumBlob,LongBlob;
+		.Coleção -> Enum,Set;
+	
+	.Espacial -> Geometry,Point,Polygon,Multipolygon;
+	
+
+Criar tabelas:
+
+	$ use cadastro -> especifica a base
+
+	$ create table pessoas (
+	nome varchar (30),      |    
+	idade tinyint(3),       |
+	sexo char(1),           |-> Campos
+	peso float,             |
+	altura float,
+	nacionalidade varchar(20)
+	);
+
+Comando para examinar tabela:
+
+	$ describe pessoas;
+
+Comando para visualizar bases de dados:
+
+	$ show databases;
+
+Excluir:
+	$ drop database cadastro;
+
+Constrains:
+
+	$ create datebase cadastro
+	defaut charactere set utf8
+	defaut collate utf8_general_ci;
+
+Create more specific tables:
+
+	create table pessoas ( id int not null auto_increment, nome varchar(30) not null, nascimento date, sexo enum('M','F'), peso decimal(5,2), altura decimal(3,2), nacionalidade varchar(20) default 'Brasil', primary key (id) )default charset = utf8
+
