@@ -1,0 +1,130 @@
+comando de criação:
+
+	$ docker run -d/i -p 80:80 --name <nome> --rm <imagem>
+
+flags:
+
+	-d: rodar em segundo plano (detached);
+	-i: rodar de forma iterativa;
+	-p: designar a porta de comunicação do container e da máquina;
+	-rm: excluir container depois do stop;
+
+acessando logs de container:
+
+	$ docker logs <id>
+
+removendo containers:
+
+	$ docker rm <id>
+
+executando o build:
+
+	$ docker build .
+
+listar imagens:
+
+	$ docker images
+
+nomear imagens:
+
+	$ docker tag <id> <nome>:<tag>
+
+criar imagens com nome já definido:
+
+	$ docker build -t <nome>:<tag> .
+
+remover imagem:
+
+	$ docker rmi -f <nome>:<tag>
+
+remover coisas sem uso:
+
+	$ docker system prune
+
+copiar arquivos do cotainer:
+
+	$ docker cp <nome_container>:<caminho> <caminho>
+
+inspeção de containers:
+
+	$ docker top <container>
+	$ docker inspect <container>
+
+verificar processamento:
+
+	$ docker stats
+
+autenticação no Docker Hub:
+
+	$ docker login
+
+logout do docker hub:
+
+	$ docker logut
+
+enviando imagens para o docker hub:
+
+	$ docker push <imagem>
+
+Volumes anônimos:
+
+	$ docker run -v /data
+
+ver volumes:
+
+	$ docker volume ls
+
+volume nomeados:
+
+	$ docker run -v nome_do_volume:/diretório
+
+volume bind mount:
+
+	$ docker run /diretorio_serv:/diretorio_cont
+
+atualização de projetos co bind mount:
+
+	. colocar diretório base do projeto no pc e no servidor;
+
+criando volumes manualmente:
+
+	$ docker volume create <nome>
+
+checando volumes:
+
+	$ docker volumes inspect <nome>
+
+removendo volumes:
+
+	$ docker volume rm <nome>
+
+removendo volume em massa:
+
+	$ docker volume prune
+
+tipos de rede:
+
+	. bridge;
+	. host;
+	. macvlan;
+	. none;
+
+listando redes:
+
+	$ docker network ls
+
+criando redes:
+
+	$ docker network create -d <driver> <nome>
+
+removendo redes:
+
+	$ docker network rm <nome>
+
+removendo redes não utilizadas:
+
+	$ docker network prune
+
+intalando postman:
+
+	$ 
