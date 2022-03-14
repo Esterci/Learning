@@ -125,6 +125,18 @@ removendo redes não utilizadas:
 
 	$ docker network prune
 
-intalando postman:
+iniciando container com network:
 
-	$ 
+	$ docker run -d -p 5000:5000 --name <nome> --rm --network <network> <imagem>
+
+conectando container:
+	
+	$ docker network connect <network> <id>
+
+desconectando container:
+
+	$ docker network disconnect <rede> <id>
+
+inspecionando redes:
+
+	$ docker network inspect <rede>

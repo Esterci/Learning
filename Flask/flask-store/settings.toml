@@ -1,0 +1,11 @@
+[default]
+SQLALCHEMY_TRACK_MODIFICATIONS=false
+
+[development]
+SQLALCHEMY_DATABASE_URI = "mysql://flasktest:Magnus%%2022@localhost/flask-store-dev"
+
+[production]
+SQLALCHEMY_DATABASE_URI = "postgresql://postgres:docker@localhost/flask-store"
+
+[testing]
+SQLALCHEMY_DATABASE_URI = "sqlite://"
