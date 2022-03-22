@@ -1,8 +1,6 @@
 from flask import Flask
 
-from app import extensions
-
-from app import routes
+from app import extensions, routes
 
 
 def create_app():

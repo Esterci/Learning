@@ -61,4 +61,4 @@ dependencies:
     - typing-extensions==4.1.1
     - urllib3==1.26.8
     - wtforms==3.0.1
-prefix: /home/matheus/anaconda3/envs/magnus_flask
+prefix: /home/thiago/anaconda3/envs/magnus_flask

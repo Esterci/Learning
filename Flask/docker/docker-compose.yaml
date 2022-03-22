@@ -1,0 +1,12 @@
+version: '3.3'
+
+services:
+  db: 
+    image: mysql-flask
+    volumes:
+      - ./mysql/:/docker-entrypoint-initdb.d/
+    restart: always 
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./config/db.env
