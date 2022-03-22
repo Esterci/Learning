@@ -1,0 +1,65 @@
+name: magnus_flask
+
+channels:
+  - anaconda
+  - defaults
+
+dependencies:
+  - ca-certificates=2020.10.14=0
+  - certifi=2020.6.20=py38_0
+  - click=7.1.2=py_0
+  - flask=1.1.2=py_0
+  - itsdangerous=1.1.0=py_0
+  - jinja2=2.11.2=py_0
+  - ld_impl_linux-64=2.33.1=h53a641e_7
+  - libedit=3.1.20191231=h14c3975_1
+  - libffi=3.3=he6710b0_2
+  - libgcc-ng=9.1.0=hdf63c60_0
+  - libstdcxx-ng=9.1.0=hdf63c60_0
+  - markupsafe=1.1.1=py38h7b6447c_0
+  - ncurses=6.2=he6710b0_1
+  - openssl=1.1.1h=h7b6447c_0
+  - pip=20.2.4=py38_0
+  - python=3.8.5=h7579374_1
+  - readline=8.0=h7b6447c_0
+  - setuptools=50.3.0=py38hb0f4dca_1
+  - sqlite=3.33.0=h62c20be_0
+  - tk=8.6.10=hbc83047_0
+  - werkzeug=1.0.1=py_0
+  - wheel=0.35.1=py_0
+  - xz=5.2.5=h7b6447c_0
+  - zlib=1.2.11=h7b6447c_3
+  - pip:
+    - alembic==1.7.6
+    - aniso8601==9.0.1
+    - black==22.1.0
+    - blinker==1.4
+    - charset-normalizer==2.0.12
+    - dynaconf==3.1.7
+    - flask-admin==1.6.0
+    - flask-cors==3.0.10
+    - flask-jwt-extended==4.3.1
+    - flask-mail==0.9.1
+    - flask-migrate==3.1.0
+    - flask-restful==0.3.9
+    - flask-sqlalchemy==2.5.1
+    - flask-scaffold
+    - greenlet==1.1.2
+    - idna==3.3
+    - importlib-metadata==4.11.2
+    - mako==1.1.6
+    - mypy-extensions==0.4.3
+    - numpy==1.22.2
+    - pathspec==0.9.0
+    - platformdirs==2.5.1
+    - pyjwt==2.3.0
+    - pytz==2021.3
+    - pyyaml==6.0
+    - requests==2.27.1
+    - six==1.16.0
+    - sqlalchemy==1.4.31
+    - tomli==2.0.1
+    - typing-extensions==4.1.1
+    - urllib3==1.26.8
+    - wtforms==3.0.1
+prefix: /home/thiago/anaconda3/envs/magnus_flask
