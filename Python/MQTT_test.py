@@ -12,7 +12,7 @@ def move(atual):
 
 
 # Set to your Adafruit IO key.
-ADAFRUIT_IO_KEY = 'aio_gTQP308mmzqtedc1ruMNq7fH0850'
+ADAFRUIT_IO_KEY = 'aio_pFRc02jlf1rFCruYFIHoACw26RNH'
 # Set to your Adafruit IO username.
 ADAFRUIT_IO_USERNAME = 'thiagoesterci'
 
